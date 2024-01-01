@@ -80,9 +80,18 @@ fn patch_executable() {
 		patch: vec![0xEB],
 	};
 
+	let scaling_patch_gog = Patch {
+		pattern: vec![0xF3, 0x0F, 0x10, 0x00, 0x0F, 0x2F, 0xC2, 0x76, 0x04, 0x8D, 0x44, 0x24, 0x04, 0xD9, 0x00, 0x83],
+		diff_offset: 7,
+		patch: vec![0xEB],
+	};
+
 	match get_executable_range() {
 		Ok((base_addr, size)) => {
-			if apply_patch(&scaling_patch, base_addr, size).is_err() {
+			let res_patch = apply_patch(&scaling_patch, base_addr, size);
+			let res_patch_gog = apply_patch(&scaling_patch_gog, base_addr, size);
+
+			if res_patch.is_err() && res_patch_gog.is_err() {
 				error_message(s!("Failed to apply the UI scaling patch!"));
 			}
 		}
